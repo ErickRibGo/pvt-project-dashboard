@@ -1,20 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { ProjectsService } from "./projects.service";
 
-/**
- * Testes das regras de negócio do Painel de Projetos.
- *
- * Estamos testando o comportamento público do service:
- * dado um conjunto de projetos, qual status e quais indicadores
- * a aplicação retorna para cada um.
- */
 describe("ProjectsService", () => {
   const projectsService = new ProjectsService();
 
-  /**
-   * Função auxiliar para encontrar um projeto específico
-   * e evitar repetir código nos testes.
-   */
   function getProjectById(projectId: string) {
     const projects = projectsService.listProjects();
 
@@ -33,6 +22,7 @@ describe("ProjectsService", () => {
     expect(project.healthStatus).toBe("SAUDAVEL");
     expect(project.hoursBalance).toBe(220);
     expect(project.hoursConsumptionPercent).toBe(56);
+
     expect(project.healthReasons).toContain(
       "Projeto dentro dos indicadores esperados."
     );
@@ -74,7 +64,7 @@ describe("ProjectsService", () => {
     );
   });
 
-  it("deve filtrar apenas os projetos críticos", () => {
+  it("deve retornar somente projetos críticos ao aplicar o filtro", () => {
     const projects = projectsService.listProjects({
       healthStatus: "CRITICO"
     });
