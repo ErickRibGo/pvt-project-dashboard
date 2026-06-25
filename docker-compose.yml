@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pvt-project-dashboard-postgres
+
+    environment:
+      POSTGRES_USER: pvt_user
+      POSTGRES_PASSWORD: pvt_password
+      POSTGRES_DB: pvt_dashboard
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pvt_user -d pvt_dashboard"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres_data:
