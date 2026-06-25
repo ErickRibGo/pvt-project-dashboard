@@ -1,32 +1,35 @@
-import { projectsMock } from "../data/projects.mock";
 import {
   ProjectDashboardItem,
   ProjectHealthStatus,
   ProjectSourceData
 } from "../types/project";
+import { ProjectsRepository } from "../repositories/projects.repository";
 
-/**
- * Filtros aceitos na listagem de projetos.
- */
 interface ListProjectsFilters {
   healthStatus?: ProjectHealthStatus;
 }
 
 /**
- * Service responsável por concentrar as regras de negócio
- * relacionadas ao Painel de Projetos.
+ * Contém as regras de negócio do Painel de Projetos.
  *
- * O controller não deve calcular saldo, consumo ou status.
- * Ele apenas recebe a requisição e usa este service.
+ * Este service não sabe se os dados vêm de mock, PostgreSQL
+ * ou uma sincronização com o TOTVS RM.
  */
 export class ProjectsService {
+  public constructor(
+    private readonly projectsRepository: ProjectsRepository
+  ) {}
+
   /**
-   * Lista os projetos já enriquecidos com indicadores do painel.
+   * Busca os projetos na fonte configurada e devolve os dados
+   * enriquecidos com os indicadores do dashboard.
    */
-  public listProjects(
+  public async listProjects(
     filters: ListProjectsFilters = {}
-  ): ProjectDashboardItem[] {
-    const dashboardProjects = projectsMock.map((project) =>
+  ): Promise<ProjectDashboardItem[]> {
+    const sourceProjects = await this.projectsRepository.findAll();
+
+    const dashboardProjects = sourceProjects.map((project) =>
       this.buildDashboardItem(project)
     );
 
@@ -39,14 +42,12 @@ export class ProjectsService {
     );
   }
 
-  /**
-   * Converte dados brutos do projeto em dados próprios para o dashboard.
-   */
   private buildDashboardItem(
     project: ProjectSourceData
   ): ProjectDashboardItem {
     const hoursBalance = this.calculateHoursBalance(project);
-    const hoursConsumptionPercent = this.calculateHoursConsumptionPercent(project);
+    const hoursConsumptionPercent =
+      this.calculateHoursConsumptionPercent(project);
 
     const financialProgressPercent =
       this.calculateFinancialProgressPercent(project);
@@ -72,22 +73,10 @@ export class ProjectsService {
     };
   }
 
-  /**
-   * Calcula quantas horas ainda estão disponíveis no contrato.
-   *
-   * Fórmula:
-   * horas vendidas - horas aprovadas/apontadas.
-   */
   private calculateHoursBalance(project: ProjectSourceData): number {
     return project.hoursSold - project.approvedHours;
   }
 
-  /**
-   * Calcula o percentual de consumo de horas do projeto.
-   *
-   * Fórmula:
-   * (horas aprovadas / horas vendidas) * 100
-   */
   private calculateHoursConsumptionPercent(
     project: ProjectSourceData
   ): number {
@@ -101,12 +90,6 @@ export class ProjectsService {
     return Number(percentage.toFixed(2));
   }
 
-  /**
-   * Calcula o avanço financeiro do projeto.
-   *
-   * Fórmula:
-   * (valor faturado / valor total do contrato) * 100
-   */
   private calculateFinancialProgressPercent(
     project: ProjectSourceData
   ): number {
@@ -120,18 +103,6 @@ export class ProjectsService {
     return Number(percentage.toFixed(2));
   }
 
-  /**
-   * Determina a saúde do projeto usando critérios objetivos.
-   *
-   * Prioridade:
-   * 1. CRITICO
-   * 2. ATENCAO
-   * 3. SAUDAVEL
-   *
-   * Regra importante:
-   * se um projeto atende a mais de uma condição,
-   * a condição mais grave prevalece.
-   */
   private calculateHealthStatus({
     project,
     hoursBalance,

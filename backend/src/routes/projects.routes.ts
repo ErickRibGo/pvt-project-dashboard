@@ -1,19 +1,22 @@
 import { Router } from "express";
 import { ProjectsController } from "../controllers/projects.controller";
+import { InMemoryProjectsRepository } from "../repositories/in-memory-projects.repository";
+import { ProjectsService } from "../services/projects.service";
 
-/**
- * Router responsável pelas rotas relacionadas a projetos.
- */
 const projectsRoutes = Router();
 
-const projectsController = new ProjectsController();
-
 /**
- * Lista os projetos e seus indicadores de saúde.
+ * Aqui definimos qual implementação de repositório será usada.
  *
- * GET /api/v1/projects
- * GET /api/v1/projects?healthStatus=CRITICO
+ * Hoje: InMemoryProjectsRepository
+ * Depois: PrismaProjectsRepository
  */
+const projectsRepository = new InMemoryProjectsRepository();
+
+const projectsService = new ProjectsService(projectsRepository);
+
+const projectsController = new ProjectsController(projectsService);
+
 projectsRoutes.get("/", projectsController.list);
 
 export { projectsRoutes };

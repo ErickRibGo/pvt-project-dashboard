@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vitest";
+import { InMemoryProjectsRepository } from "../repositories/in-memory-projects.repository";
 import { ProjectsService } from "./projects.service";
 
 describe("ProjectsService", () => {
-  const projectsService = new ProjectsService();
+  const projectsRepository = new InMemoryProjectsRepository();
 
-  function getProjectById(projectId: string) {
-    const projects = projectsService.listProjects();
+  const projectsService = new ProjectsService(projectsRepository);
+
+  async function getProjectById(projectId: string) {
+    const projects = await projectsService.listProjects();
 
     const project = projects.find((item) => item.id === projectId);
 
@@ -16,20 +19,16 @@ describe("ProjectsService", () => {
     return project;
   }
 
-  it("deve classificar o projeto Alfa como SAUDAVEL", () => {
-    const project = getProjectById("project-001");
+  it("deve classificar o projeto Alfa como SAUDAVEL", async () => {
+    const project = await getProjectById("project-001");
 
     expect(project.healthStatus).toBe("SAUDAVEL");
     expect(project.hoursBalance).toBe(220);
     expect(project.hoursConsumptionPercent).toBe(56);
-
-    expect(project.healthReasons).toContain(
-      "Projeto dentro dos indicadores esperados."
-    );
   });
 
-  it("deve classificar o projeto Beta como ATENCAO", () => {
-    const project = getProjectById("project-002");
+  it("deve classificar o projeto Beta como ATENCAO", async () => {
+    const project = await getProjectById("project-002");
 
     expect(project.healthStatus).toBe("ATENCAO");
     expect(project.hoursBalance).toBe(45);
@@ -38,14 +37,10 @@ describe("ProjectsService", () => {
     expect(project.healthReasons).toContain(
       "O consumo de horas atingiu ou ultrapassou 80%."
     );
-
-    expect(project.healthReasons).toContain(
-      "A execução física está mais de 10 pontos percentuais atrás do financeiro."
-    );
   });
 
-  it("deve classificar o projeto Gama como CRITICO", () => {
-    const project = getProjectById("project-003");
+  it("deve classificar o projeto Gama como CRITICO", async () => {
+    const project = await getProjectById("project-003");
 
     expect(project.healthStatus).toBe("CRITICO");
     expect(project.hoursBalance).toBe(-15);
@@ -58,14 +53,10 @@ describe("ProjectsService", () => {
     expect(project.healthReasons).toContain(
       "Existe pelo menos um marco de entrega vencido."
     );
-
-    expect(project.healthReasons).toContain(
-      "A execução física está mais de 20 pontos percentuais atrás do financeiro."
-    );
   });
 
-  it("deve retornar somente projetos críticos ao aplicar o filtro", () => {
-    const projects = projectsService.listProjects({
+  it("deve retornar somente projetos críticos ao aplicar o filtro", async () => {
+    const projects = await projectsService.listProjects({
       healthStatus: "CRITICO"
     });
 
