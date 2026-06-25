@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { projectsRoutes } from "./projects.routes";
+import { projectsRoutes } from "./projects.routes.js";
 
 /**
  * Router principal da aplicação.

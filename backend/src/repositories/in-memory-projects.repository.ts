@@ -1,6 +1,6 @@
-import { projectsMock } from "../data/projects.mock";
-import { ProjectSourceData } from "../types/project";
-import { ProjectsRepository } from "./projects.repository";
+import { projectsMock } from "../data/projects.mock.js";
+import { ProjectSourceData } from "../types/project.js";
+import { ProjectsRepository } from "./projects.repository.js";
 
 /**
  * Implementação temporária do repositório usando dados em memória.

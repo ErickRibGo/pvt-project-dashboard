@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { ProjectsController } from "../controllers/projects.controller";
-import { InMemoryProjectsRepository } from "../repositories/in-memory-projects.repository";
-import { ProjectsService } from "../services/projects.service";
+import { ProjectsController } from "../controllers/projects.controller.js";
+import { InMemoryProjectsRepository } from "../repositories/in-memory-projects.repository.js";
+import { ProjectsService } from "../services/projects.service.js";
 
 const projectsRoutes = Router();
 

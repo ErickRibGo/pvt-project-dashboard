@@ -1,4 +1,4 @@
-import { ProjectSourceData } from "../types/project";
+import { ProjectSourceData } from "../types/project.js";
 
 /**
  * Simula os dados que, em um cenário real,

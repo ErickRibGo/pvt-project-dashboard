@@ -1,7 +1,7 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
-import { routes } from "./routes";
+import { routes } from "./routes/index.js";
 
 // Carrega variáveis do arquivo .env para process.env.
 dotenv.config();

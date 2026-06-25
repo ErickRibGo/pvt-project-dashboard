@@ -1,4 +1,4 @@
-import { ProjectSourceData } from "../types/project";
+import { ProjectSourceData } from "../types/project.js";
 
 /**
  * Contrato para qualquer fonte de dados de projetos.

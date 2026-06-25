@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { ProjectsService } from "../services/projects.service";
+import { ProjectsService } from "../services/projects.service.js";
 
 const listProjectsQuerySchema = z.object({
   healthStatus: z.enum(["SAUDAVEL", "ATENCAO", "CRITICO"]).optional()

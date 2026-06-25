@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ProjectLifecycleStatus {
+  ATIVO
+  ENCERRADO
+  CANCELADO
+}
+
+enum TimeEntryStatus {
+  PENDENTE
+  APROVADO
+  REJEITADO
+  SINCRONIZADO_RM
+}
+
+enum MilestoneStatus {
+  PENDENTE
+  CONCLUIDO
+  ATRASADO
+  CANCELADO
+}
+
+enum BillingStatus {
+  PREVISTO
+  FATURADO
+  CANCELADO
+}
+
+model Client {
+  id        String   @id @default(cuid())
+  rmId      String?  @unique
+  name      String
+  document  String?  @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects Project[]
+
+  @@index([name])
+  @@map("clients")
+}
+
+model Project {
+  id              String                 @id @default(cuid())
+  rmId            String?                @unique
+  code            String                 @unique
+  name            String
+  clientId        String
+  lifecycleStatus ProjectLifecycleStatus @default(ATIVO)
+  startDate       DateTime               @db.Date
+  endDate         DateTime?              @db.Date
+  soldHours       Decimal                @db.Decimal(10, 2)
+  contractValue   Decimal                @db.Decimal(14, 2)
+  lastSyncedAt    DateTime?
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
+  client      Client       @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  allocations Allocation[]
+  timeEntries TimeEntry[]
+  milestones  Milestone[]
+  billings    Billing[]
+
+  @@index([clientId])
+  @@index([lifecycleStatus])
+  @@map("projects")
+}
+
+model Analyst {
+  id        String   @id @default(cuid())
+  rmId      String?  @unique
+  name      String
+  email     String   @unique
+  role      String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  allocations Allocation[]
+  timeEntries TimeEntry[]
+
+  @@index([name])
+  @@map("analysts")
+}
+
+model Allocation {
+  id           String   @id @default(cuid())
+  projectId    String
+  analystId    String
+  startDate    DateTime @db.Date
+  endDate      DateTime? @db.Date
+  plannedHours Decimal  @db.Decimal(10, 2)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  analyst Analyst @relation(fields: [analystId], references: [id], onDelete: Restrict)
+
+  timeEntries TimeEntry[]
+
+  @@unique([projectId, analystId, startDate])
+  @@index([projectId])
+  @@index([analystId])
+  @@map("allocations")
+}
+
+model TimeEntry {
+  id           String          @id @default(cuid())
+  rmId         String?         @unique
+  projectId    String
+  analystId    String
+  allocationId String?
+  workDate     DateTime        @db.Date
+  hours        Decimal         @db.Decimal(6, 2)
+  description  String?
+  status       TimeEntryStatus @default(PENDENTE)
+  approvedAt   DateTime?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  project    Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  analyst    Analyst     @relation(fields: [analystId], references: [id], onDelete: Restrict)
+  allocation Allocation? @relation(fields: [allocationId], references: [id], onDelete: SetNull)
+
+  @@index([projectId, status])
+  @@index([analystId, workDate])
+  @@index([workDate])
+  @@map("time_entries")
+}
+
+model Milestone {
+  id          String          @id @default(cuid())
+  projectId   String
+  title       String
+  weight      Decimal         @db.Decimal(5, 2)
+  plannedDate DateTime        @db.Date
+  completedAt DateTime?       @db.Date
+  status      MilestoneStatus @default(PENDENTE)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, status])
+  @@index([plannedDate])
+  @@map("milestones")
+}
+
+model Billing {
+  id          String        @id @default(cuid())
+  rmId        String?       @unique
+  projectId   String
+  amount      Decimal       @db.Decimal(14, 2)
+  billingDate DateTime      @db.Date
+  status      BillingStatus @default(PREVISTO)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, status])
+  @@index([billingDate])
+  @@map("billings")
+}

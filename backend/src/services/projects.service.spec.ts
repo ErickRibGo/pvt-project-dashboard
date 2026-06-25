@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { InMemoryProjectsRepository } from "../repositories/in-memory-projects.repository";
-import { ProjectsService } from "./projects.service";
+import { InMemoryProjectsRepository } from "../repositories/in-memory-projects.repository.js";
+import { ProjectsService } from "./projects.service.js";
 
 describe("ProjectsService", () => {
   const projectsRepository = new InMemoryProjectsRepository();

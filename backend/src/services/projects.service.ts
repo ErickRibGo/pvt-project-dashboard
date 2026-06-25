@@ -2,8 +2,8 @@ import {
   ProjectDashboardItem,
   ProjectHealthStatus,
   ProjectSourceData
-} from "../types/project";
-import { ProjectsRepository } from "../repositories/projects.repository";
+} from "../types/project.js";
+import { ProjectsRepository } from "../repositories/projects.repository.js";
 
 interface ListProjectsFilters {
   healthStatus?: ProjectHealthStatus;
