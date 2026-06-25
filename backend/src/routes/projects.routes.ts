@@ -1,17 +1,18 @@
 import { Router } from "express";
 import { ProjectsController } from "../controllers/projects.controller.js";
-import { InMemoryProjectsRepository } from "../repositories/in-memory-projects.repository.js";
+import { PrismaProjectsRepository } from "../repositories/prisma-projects.repository.js";
 import { ProjectsService } from "../services/projects.service.js";
 
 const projectsRoutes = Router();
 
 /**
- * Aqui definimos qual implementação de repositório será usada.
+ * Ambiente real:
+ * PrismaProjectsRepository → PostgreSQL
  *
- * Hoje: InMemoryProjectsRepository
- * Depois: PrismaProjectsRepository
+ * Para testes unitários:
+ * InMemoryProjectsRepository → dados mockados
  */
-const projectsRepository = new InMemoryProjectsRepository();
+const projectsRepository = new PrismaProjectsRepository();
 
 const projectsService = new ProjectsService(projectsRepository);
 

@@ -31,7 +31,7 @@ export interface ProjectSourceData {
   lifecycleStatus: ProjectLifecycleStatus;
 
   startDate: string;
-  endDate: string;
+  endDate: string | null;
 
   hoursSold: number;
   hoursPlanned: number;
