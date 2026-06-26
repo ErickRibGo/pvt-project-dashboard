@@ -571,12 +571,11 @@ O fluxo principal pode ser demonstrado em poucos minutos:
 8. Mostrar os testes automatizados;
 9. Explicar como o repository permite trocar mock, banco e integração RM sem reescrever regras.
 
+## Demonstração visual
 ---
+<img width="1273" height="948" alt="image" src="https://github.com/user-attachments/assets/e8a0285c-c54c-47ce-ae58-e1d827aae3e2" />
+
 
 ## Autor
 
 Erick Ribeiro Gonçalves
-
-cd C:\Projetos\pvt-project-dashboard
-git add README.md
-git commit -m "docs: documenta arquitetura e decisões do projeto"
